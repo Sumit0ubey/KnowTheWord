@@ -23,6 +23,7 @@ class MyApplication : Application() {
 
     private suspend fun initializeSDK() {
         try {
+
             // Step 1: Initialize SDK
             RunAnywhere.initialize(
                 context = this@MyApplication,

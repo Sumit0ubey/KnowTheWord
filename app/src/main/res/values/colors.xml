@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Light Theme Colors -->
+    <color name="purple_40">#FF6650a4</color>
+    <color name="purple_grey_40">#FF625b71</color>
+    <color name="pink_40">#FF7D5260</color>
+
+    <!-- Dark Theme Colors -->
+    <color name="purple_80">#FFD0BCFF</color>
+    <color name="purple_grey_80">#FFCCC2DC</color>
+    <color name="pink_80">#FFEFB8C8</color>
+
+    <!-- Neutral colors for backgrounds and surfaces -->
+    <color name="neutral_10">#FF1C1B1F</color>
+    <color name="neutral_90">#FFE6E1E5</color>
+    <color name="neutral_99">#FFFDFCFD</color>
+
+    <!-- Surface colors for cards, sheets, and menus -->
+    <color name="surface_light">#FFFEFBFF</color>
+    <color name="surface_dark">#FF141218</color>
+    <color name="surface_variant_light">#FFE7E0EC</color>
+    <color name="surface_variant_dark">#FF49454F</color>
+
+    <!-- Text and Icon colors -->
+    <color name="on_primary_light">#FFFFFFFF</color>
+    <color name="on_primary_dark">#FF381E72</color>
+    <color name="on_secondary_light">#FFFFFFFF</color>
+    <color name="on_secondary_dark">#FF332D41</color>
+    <color name="on_tertiary_light">#FFFFFFFF</color>
+    <color name="on_tertiary_dark">#FF492532</color>
+
+    <!-- Error colors -->
+    <color name="error_light">#FFB3261E</color>
+    <color name="error_dark">#FFF2B8B5</color>
+    <color name="on_error_light">#FFFFFFFF</color>
+    <color name="on_error_dark">#FF601410</color>
+
+    <!-- Default colors often included -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
