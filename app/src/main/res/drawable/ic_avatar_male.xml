@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Male avatar icon -->
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,6c1.93,0 3.5,1.57 3.5,3.5S13.93,13 12,13s-3.5,-1.57 -3.5,-3.5S10.07,6 12,6z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,20c-2.5,0 -4.71,-1.28 -6,-3.22c0.03,-1.99 4,-3.08 6,-3.08s5.97,1.09 6,3.08C16.71,18.72 14.5,20 12,20z"/>
+</vector>

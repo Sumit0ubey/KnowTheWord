@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bottom Navigation Active Indicator -->
+    <style name="BottomNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/surfaceColorLight</item>
+        <item name="android:width">64dp</item>
+        <item name="android:height">32dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.App.SmallComponent</item>
+    </style>
+    
+    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+    
+    <!-- Card Style -->
+    <style name="CardStyle.Dark" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/cardBackground</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/dividerColor</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+    
+    <!-- Input Field Style -->
+    <style name="InputFieldStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/inputFieldBackground</item>
+        <item name="boxStrokeColor">@color/colorPrimary</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="hintTextColor">@color/textHint</item>
+    </style>
+    
+    <!-- Primary Button Style -->
+    <style name="ButtonStyle.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/colorPrimary</item>
+        <item name="cornerRadius">24dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    
+    <!-- Icon Button Style -->
+    <style name="IconButtonStyle" parent="Widget.MaterialComponents.Button.Icon">
+        <item name="backgroundTint">@color/iconBackgroundColor</item>
+        <item name="cornerRadius">22dp</item>
+        <item name="iconTint">@color/iconColor</item>
+    </style>
+</resources>

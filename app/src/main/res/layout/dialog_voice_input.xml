@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E6000000">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <!-- Animated Voice Circle -->
+        <FrameLayout
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center">
+
+            <!-- Outer pulse ring -->
+            <View
+                android:id="@+id/pulseRing"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:background="@drawable/voice_circle_pulse"
+                android:alpha="0.3" />
+
+            <!-- Main circle -->
+            <View
+                android:id="@+id/voiceCircle"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_gravity="center"
+                android:background="@drawable/voice_circle_bg" />
+
+            <!-- Mic icon -->
+            <ImageView
+                android:id="@+id/micIcon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:src="@drawable/audio_icon"
+                app:tint="@android:color/white" />
+
+        </FrameLayout>
+
+        <!-- Status text -->
+        <TextView
+            android:id="@+id/voiceStatusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Listening..."
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Transcribed text preview -->
+        <TextView
+            android:id="@+id/transcribedText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:maxLines="3"
+            android:text=""
+            android:textColor="#CCFFFFFF"
+            android:textSize="16sp" />
+
+        <!-- Hint text -->
+        <TextView
+            android:id="@+id/hintText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Try: &quot;Open WhatsApp&quot; or &quot;Turn on flashlight&quot;"
+            android:textColor="#80FFFFFF"
+            android:textSize="14sp" />
+
+        <!-- Cancel button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancelButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Cancel"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+</FrameLayout>

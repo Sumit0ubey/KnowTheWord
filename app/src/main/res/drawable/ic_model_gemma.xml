@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Gemma model icon - Google Blue/Red/Yellow/Green -->
+    <path
+        android:fillColor="#4285F4"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2z"/>
+    <path
+        android:fillColor="#EA4335"
+        android:pathData="M12,7l3,5h-6z"/>
+    <path
+        android:fillColor="#FBBC05"
+        android:pathData="M9,12l3,5 3,-5z"/>
+    <path
+        android:fillColor="#34A853"
+        android:pathData="M12,12m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"/>
+</vector>

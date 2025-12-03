@@ -1,10 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    
+    <!-- Permissions for voice input -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    
+    <!-- Permissions for reminders and notifications -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    
+    <!-- Permission to query all installed apps (Android 11+) -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+    
+    <!-- Queries for specific app categories we want to launch -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <!-- Common apps -->
+        <package android:name="com.whatsapp" />
+        <package android:name="com.instagram.android" />
+        <package android:name="com.snapchat.android" />
+        <package android:name="com.facebook.katana" />
+        <package android:name="com.twitter.android" />
+        <package android:name="org.telegram.messenger" />
+        <package android:name="com.google.android.youtube" />
+        <package android:name="com.spotify.music" />
+        <package android:name="com.google.android.apps.nbu.paisa.user" />
+        <package android:name="net.one97.paytm" />
+        <package android:name="com.phonepe.app" />
+        <package android:name="com.amazon.mShop.android.shopping" />
+        <package android:name="com.flipkart.android" />
+        <package android:name="com.discord" />
+        <package android:name="com.linkedin.android" />
+        <package android:name="com.netflix.mediaclient" />
+        <package android:name="in.startv.hotstar" />
+    </queries>
 
     <application
         android:name=".MyApplication"
@@ -14,20 +58,49 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_launcher_foreground"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Startup_hackathon20">
+        <!-- New Main Activity with Bottom Navigation -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Startup_hackathon20">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- Old MainActivity (kept for compatibility) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Startup_hackathon20" />
+        
+        <!-- Voice Assistant Activity (Full-screen offline voice) -->
+        <activity
+            android:name=".VoiceAssistantActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Startup_hackathon20"
+            android:screenOrientation="portrait" />
+        
+        <!-- Audio Notes Analyzer Activity -->
+        <activity
+            android:name=".AudioNotesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Startup_hackathon20"
+            android:screenOrientation="portrait" />
+        
+        <!-- BroadcastReceiver for reminder notifications -->
+        <receiver
+            android:name=".domain.service.ReminderBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.runanywhere.startup_hackathon20.REMINDER_TRIGGERED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

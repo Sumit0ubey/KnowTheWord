@@ -1,35 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple">#FF6650a4</color>
+    <!-- Crimson Red Theme Colors -->
+    <color name="colorPrimary">#DC143C</color>
+    <color name="colorPrimaryVariant">#B91030</color>
+    <color name="colorPrimaryDark">#8B0A1A</color>
+    <color name="colorSecondary">#FF4D6D</color>
+    <color name="colorAccent">#FF6B6B</color>
+    
+    <!-- Background colors - Deep Black -->
+    <color name="backgroundColor">#000000</color>
+    <color name="backgroundDark">#000000</color>
+    <color name="surfaceColor">#0A0A0A</color>
+    <color name="surfaceColorLight">#141414</color>
+    <color name="cardBackground">#0D0D0D</color>
+    <color name="cardBackgroundLight">#1A1A1A</color>
+    
+    <!-- Chat bubble colors -->
+    <color name="userBubbleColor">#DC143C</color>
+    <color name="userBubbleGradientStart">#FF4D6D</color>
+    <color name="userBubbleGradientEnd">#DC143C</color>
+    <color name="assistantBubbleColor">#141414</color>
+    <color name="userTextColor">#FFFFFF</color>
+    <color name="assistantTextColor">#F0F0F0</color>
+    
+    <!-- Text colors -->
+    <color name="textPrimary">#FFFFFF</color>
+    <color name="textSecondary">#AAAAAA</color>
+    <color name="textHint">#666666</color>
+    <color name="textMuted">#444444</color>
+    
+    <!-- Input bar -->
+    <color name="inputBarBackground">#0A0A0A</color>
+    <color name="inputFieldBackground">#141414</color>
+    <color name="inputBorderColor">#2A2A2A</color>
+    
+    <!-- Icons -->
+    <color name="iconColor">#AAAAAA</color>
+    <color name="iconColorActive">#DC143C</color>
+    <color name="iconBackgroundColor">#1A1A1A</color>
+    
+    <!-- Status bar -->
+    <color name="statusBarColor">#000000</color>
+    <color name="navigationBarColor">#000000</color>
+    
+    <!-- Accent colors -->
+    <color name="accentGreen">#00E676</color>
+    <color name="accentBlue">#00B0FF</color>
+    <color name="accentOrange">#FF9100</color>
+    <color name="accentPink">#FF4D6D</color>
+    <color name="accentPurple">#DC143C</color>
+    <color name="accentRed">#DC143C</color>
+    
+    <!-- Gradient colors for effects -->
+    <color name="gradientPurpleStart">#FF4D6D</color>
+    <color name="gradientPurpleEnd">#8B0A1A</color>
+    <color name="gradientRedStart">#FF4D6D</color>
+    <color name="gradientRedEnd">#DC143C</color>
+    
+    <!-- Bottom Navigation -->
+    <color name="navBackground">#050505</color>
+    <color name="navItemActive">#DC143C</color>
+    <color name="navItemInactive">#555555</color>
+    
+    <!-- Button colors -->
+    <color name="buttonPrimary">#DC143C</color>
+    <color name="buttonPrimaryPressed">#B91030</color>
+    <color name="buttonSecondary">#1A1A1A</color>
+    
+    <!-- Divider -->
+    <color name="dividerColor">#1F1F1F</color>
+    
+    <!-- Legacy colors for compatibility -->
+    <color name="purple">#DC143C</color>
     <color name="purple_grey">#FF625b71</color>
-    <color name="pink">#FF7D5260</color>
+    <color name="pink">#FF4D6D</color>
     <color name="transparent">#00000000</color>
-    <color name="icon">#000000</color>
-    <color name="icon_background">#cecece</color>
-    <color name="cardBackground">#dddddd</color>
-
-    <!-- Neutral colors for backgrounds and surfaces -->
-    <color name="neutral_10">#FF1C1B1F</color>
-    <color name="neutral_90">#FFE6E1E5</color>
-    <color name="neutral_99">#FFFDFCFD</color>
-
-    <!-- Surface colors for cards, sheets, and menus -->
-    <color name="surface">#FFFEFBFF</color>
-    <color name="surface_variant">#FFE7E0EC</color>
-
-    <!-- Text and Icon colors -->
-    <color name="on_primary">#FFFFFFFF</color>
-    <color name="on_secondary">#FFFFFFFF</color>
-    <color name="on_tertiary">#FFFFFFFF</color>
-
-    <!-- Error colors -->
-    <color name="error">#FFB3261E</color>
-    <color name="on_error">#FFFFFFFF</color>
-
-    <!-- Default colors often included -->
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
+    <color name="icon">#AAAAAA</color>
+    <color name="icon_background">#1A1A1A</color>
+    <color name="purple_200">#FF4D6D</color>
+    <color name="purple_500">#DC143C</color>
+    <color name="purple_700">#8B0A1A</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>

@@ -18,6 +18,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    
+    testOptions {
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
+    }
 
     buildTypes {
         release {
@@ -84,7 +90,10 @@ dependencies {
 
     // AndroidX Security (required by SDK)
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
-
+    
+    // Vosk - Offline Speech Recognition (STT)
+    implementation("com.alphacephei:vosk-android:0.3.47")
+    
     // Standard app dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -97,9 +106,17 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.activity:activity-ktx:1.8.2")
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.recyclerview)
     testImplementation(libs.junit)
+    
+    // Kotest for property-based testing
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+    testImplementation("io.kotest:kotest-property:5.8.0")
+    
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

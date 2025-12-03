@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Night mode uses same dark purple theme -->
+    <!-- All colors are inherited from values/colors.xml -->
+    <!-- This file ensures consistent dark theme in night mode -->
+</resources>

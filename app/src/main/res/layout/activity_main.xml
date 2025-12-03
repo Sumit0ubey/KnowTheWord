@@ -1,160 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fillViewport="true"
-    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    android:fitsSystemWindows="true">
 
-    <!-- Main vertical content -->
     <LinearLayout
-        android:id="@+id/rootContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Status bar -->
+        <!-- App Bar -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/surfaceColor"
+            android:elevation="4dp"
+            app:menu="@menu/menu_main"
+            app:navigationIcon="@drawable/ic_assistant"
+            app:navigationIconTint="@color/accentPurple"
+            app:title="Nova"
+            app:titleTextColor="@color/textPrimary" />
+
+        <!-- Status indicator -->
         <LinearLayout
             android:id="@+id/statusBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp"
-            android:paddingHorizontal="12dp"
+            android:background="@color/surfaceColor"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
             android:paddingVertical="8dp">
+
+            <View
+                android:id="@+id/statusIndicator"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/status_indicator" />
 
             <TextView
                 android:id="@+id/statusMessage"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
                 android:text="Initializing..."
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+                android:textColor="@color/textSecondary"
+                android:textSize="13sp" />
+
+            <!-- Voice indicator -->
+            <ImageView
+                android:id="@+id/voiceIndicator"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/audio_icon"
+                android:visibility="gone"
+                app:tint="@color/accentGreen" />
+
         </LinearLayout>
 
-        <!-- Model selector (optional area at top of content) -->
+        <!-- Model selector (collapsible) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/modelSelectorRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
-            android:layout_marginBottom="4dp"
+            android:background="@color/surfaceColor"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="8dp"
             android:visibility="gone" />
 
-        <!-- Messages list fills remaining space -->
+        <!-- Messages list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/messagesRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_margin="8dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:clipToPadding="false"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingHorizontal="8dp"
+            android:scrollbars="vertical" />
 
-        <!-- Input bar fixed at bottom -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Input bar -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="2dp">
+            android:background="@color/surfaceColor"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:elevation="8dp">
 
             <LinearLayout
                 android:id="@+id/inputBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="14dp"
-                android:background="@color/cardBackground"
-                android:gravity="center_vertical">
+                android:background="@drawable/bg_input_field"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp">
 
                 <EditText
                     android:id="@+id/inputEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:hint="Type a message..."
-                    android:background="@color/transparent"
-                    android:imeOptions="actionSend"
-                    android:inputType="text" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/modelButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:padding="4dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:enabled="false"
-                        app:backgroundTint="@color/icon_background"
-                        app:iconTint="@color/icon"
-                        app:icon="@drawable/model_icon"
-                        app:iconPadding="0dp"
-                        app:iconGravity="textStart" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/addButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:padding="4dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:enabled="false"
-                        app:backgroundTint="@color/icon_background"
-                        app:iconTint="@color/icon"
-                        app:icon="@drawable/add_icon"
-                        app:iconPadding="0dp"
-                        app:iconGravity="textStart" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="right">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/audioButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:padding="4dp"
-                            android:minWidth="0dp"
-                            android:minHeight="0dp"
-                            android:enabled="false"
-                            app:backgroundTint="@color/icon_background"
-                            app:iconTint="@color/icon"
-                            app:icon="@drawable/audio_icon"
-                            app:iconPadding="0dp"
-                            app:iconGravity="textStart" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/sendButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="right"
-                            android:layout_marginStart="8dp"
-                            android:padding="4dp"
-                            android:minWidth="0dp"
-                            android:minHeight="0dp"
-                            android:enabled="false"
-                            app:backgroundTint="@color/icon_background"
-                            app:iconTint="@color/icon"
-                            app:icon="@drawable/send_arrow"
-                            app:iconPadding="0dp"
-                            app:iconGravity="textStart" />
-                    </LinearLayout>
-
-                </LinearLayout>
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="Type a message..."
+                    android:imeOptions="actionSend"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLines="4"
+                    android:minHeight="44dp"
+                    android:padding="8dp"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textHint" />
 
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Model button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/modelButton"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:insetBottom="0dp"
+                    android:insetTop="0dp"
+                    android:padding="0dp"
+                    app:backgroundTint="@color/iconBackgroundColor"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/model_icon"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/iconColor" />
+
+                <!-- Refresh models button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/addButton"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:enabled="true"
+                    android:insetBottom="0dp"
+                    android:insetTop="0dp"
+                    android:padding="0dp"
+                    app:backgroundTint="@color/iconBackgroundColor"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/add_icon"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/iconColor" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- Voice button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/audioButton"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:insetBottom="0dp"
+                    android:insetTop="0dp"
+                    android:padding="0dp"
+                    app:backgroundTint="@color/iconBackgroundColor"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/audio_icon"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/iconColor" />
+
+                <!-- Send button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sendButton"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
+                    android:insetBottom="0dp"
+                    android:insetTop="0dp"
+                    android:padding="0dp"
+                    app:backgroundTint="@color/colorPrimary"
+                    app:cornerRadius="22dp"
+                    app:icon="@drawable/send_arrow"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/white" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

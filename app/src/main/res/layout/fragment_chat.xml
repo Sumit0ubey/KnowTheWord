@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    android:orientation="vertical">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surfaceColor"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:elevation="4dp">
+
+        <!-- App Icon/Logo -->
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/nova_logo" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nova"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Status indicator -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:id="@+id/statusIndicator"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:background="@drawable/status_indicator" />
+
+                <TextView
+                    android:id="@+id/statusMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="Ready"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNewChat"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="+ New"
+            android:textColor="@color/accentPurple"
+            android:textSize="13sp"
+            app:cornerRadius="18dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnModel"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            app:backgroundTint="@color/iconBackgroundColor"
+            app:cornerRadius="18dp"
+            app:icon="@drawable/model_icon"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="18dp"
+            app:iconTint="@color/iconColor" />
+    </LinearLayout>
+
+    <!-- Model selector (collapsible) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/modelSelectorRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surfaceColor"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="8dp"
+        android:visibility="gone" />
+
+    <!-- Messages list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/messagesRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:paddingHorizontal="8dp" />
+
+    <!-- Input bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surfaceColor"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp"
+        android:elevation="8dp">
+
+        <!-- Model Popup Menu (hidden by default) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/modelPopupCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/inputFieldBackground"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Model"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginStart="8dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/modelPopupList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxHeight="200dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Input Field with Model Selector -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_input_field"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="8dp"
+            android:paddingVertical="4dp">
+
+            <!-- Current Model Icon - click to change model -->
+            <ImageView
+                android:id="@+id/btnModelIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="2dp"
+                android:src="@drawable/ic_model_default"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Select Model" />
+
+            <EditText
+                android:id="@+id/inputEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Type a message..."
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="4"
+                android:minHeight="44dp"
+                android:paddingVertical="12dp"
+                android:textColor="@color/textPrimary"
+                android:textColorHint="@color/textHint"
+                android:textSize="15sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sendButton"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:backgroundTint="@color/colorPrimary"
+                app:cornerRadius="22dp"
+                app:icon="@drawable/send_arrow"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="20dp"
+                app:iconTint="@color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

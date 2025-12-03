@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="28dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Modern home icon with rounded corners -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,3L4,9v12h5v-7h6v7h5V9L12,3z"
+        android:strokeWidth="0"/>
+    <path
+        android:fillColor="#E8E8E8"
+        android:pathData="M12,3L4,9v1l8,-6l8,6v-1L12,3z"/>
+</vector>
