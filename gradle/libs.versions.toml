@@ -10,7 +10,6 @@ activityCompose = "1.11.0"
 composeBom = "2024.09.00"
 constraintlayout = "2.2.1"
 recyclerview = "1.4.0"
-
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

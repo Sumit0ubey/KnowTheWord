@@ -58,11 +58,11 @@ class ModelsAdapter(
             val iconRes = getModelIcon(model.name, model.id)
             modelIcon.setImageResource(iconRes)
             
-            // Get model size with star rating
-            val stars = getModelStars(model.name)
-            val starText = "★".repeat(stars) + "☆".repeat(5 - stars)
+            // Get model size with power rating
+            val powerLevel = getModelStars(model.name)
+            val powerText = "Power: $powerLevel/5"
             val sizeText = getModelSizeText(model)
-            modelSize.text = "$starText  $sizeText"
+            modelSize.text = "$powerText  |  $sizeText"
             
             // Check if model is downloaded
             val isDownloaded = try {
@@ -73,25 +73,28 @@ class ModelsAdapter(
             
             val isLoaded = model.id == currentModelId
             
-            // Set status and button
+            // Set status and button with proper vertical alignment
             when {
                 isLoaded -> {
                     modelStatus.text = "✓ Currently Active"
                     modelStatus.setTextColor(0xFF4CAF50.toInt()) // Green
                     actionButton.text = "Active"
                     actionButton.isEnabled = false
+                    actionButton.gravity = android.view.Gravity.CENTER
                 }
                 isDownloaded -> {
                     modelStatus.text = "Ready to use"
                     modelStatus.setTextColor(0xFF888888.toInt())
                     actionButton.text = "Load"
                     actionButton.isEnabled = true
+                    actionButton.gravity = android.view.Gravity.CENTER
                 }
                 else -> {
                     modelStatus.text = "Not downloaded"
                     modelStatus.setTextColor(0xFFDC143C.toInt()) // Crimson
                     actionButton.text = "Download"
                     actionButton.isEnabled = true
+                    actionButton.gravity = android.view.Gravity.CENTER
                 }
             }
             

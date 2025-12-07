@@ -36,15 +36,6 @@
                 android:textColor="@color/textPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/btnNotification"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:background="@drawable/bg_model_circle"
-                android:padding="10dp"
-                android:src="@drawable/ic_notification"
-                app:tint="@color/textSecondary" />
         </LinearLayout>
 
         <!-- Action Cards Row 1 -->

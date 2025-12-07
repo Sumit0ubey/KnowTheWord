@@ -20,6 +20,71 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="wrap">
 
+        <!-- Attachment Preview (shown when message has attachment) -->
+        <LinearLayout
+            android:id="@+id/attachmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <!-- Image Thumbnail (for images) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/attachmentImageCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:id="@+id/attachmentImage"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:scaleType="centerCrop" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- Document Icon (for PDFs, text files) -->
+            <LinearLayout
+                android:id="@+id/attachmentDocContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_document_attachment"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/attachmentDocIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_document"
+                    app:tint="@color/userTextColor" />
+
+                <TextView
+                    android:id="@+id/attachmentDocName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="middle"
+                    android:maxWidth="100dp"
+                    android:maxLines="1"
+                    android:textColor="@color/userTextColor"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/attachmentDocSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.7"
+                    android:textColor="@color/userTextColor"
+                    android:textSize="10sp" />
+            </LinearLayout>
+        </LinearLayout>
+
         <TextView
             android:id="@+id/messageText"
             android:layout_width="wrap_content"

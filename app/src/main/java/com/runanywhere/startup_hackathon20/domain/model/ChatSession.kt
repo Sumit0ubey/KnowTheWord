@@ -32,7 +32,8 @@ data class UserSettings(
     val ttsEnabled: Boolean = true,
     val voiceCharacter: String = "Nova (Default)",
     val voiceSpeed: Float = 1.0f,
-    val voicePitch: Float = 1.0f
+    val voicePitch: Float = 1.0f,
+    val actualVoiceName: String = ""  // Actual TTS voice name like "en-us-x-sfg-local"
 ) {
     /**
      * Builds a personalization prompt for the AI.

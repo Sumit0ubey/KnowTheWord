@@ -99,64 +99,138 @@ class SettingsFragment : Fragment() {
             val allVoices = tts?.voices?.filter { voice ->
                 !voice.isNetworkConnectionRequired
             }?.sortedBy { it.locale.toString() + it.name } ?: emptyList()
-            
+
+            android.util.Log.d("SettingsFragment", "📢 Found ${allVoices.size} local TTS voices")
+
             // Build voice characters from actual voices
             voiceCharacters.clear()
-            
-            // Group voices by locale and gender
+
+            // Group voices by locale
             val voicesByLocale = allVoices.groupBy { it.locale }
-            
-            // Add voices by country/accent with male/female variants
+
+            // Add voices by country/accent - EACH VOICE GETS ITS OWN ENTRY
             voicesByLocale.forEach { (locale, voices) ->
                 val country = getCountryEmoji(locale)
                 val localeName = getLocaleName(locale)
-                
-                // Find male and female voices
-                val maleVoices = voices.filter { 
-                    it.name.lowercase().contains("male") && !it.name.lowercase().contains("female")
-                }
-                val femaleVoices = voices.filter { 
-                    it.name.lowercase().contains("female")
-                }
-                val neutralVoices = voices.filter { 
-                    !it.name.lowercase().contains("male") && !it.name.lowercase().contains("female")
-                }
-                
-                // Add male voice
-                (maleVoices.firstOrNull() ?: neutralVoices.firstOrNull())?.let { voice ->
-                    voiceCharacters.add(VoiceCharacter(
-                        "$country $localeName - Male",
-                        1.0f, 0.9f,
-                        "Male voice with $localeName accent",
-                        voice
-                    ))
-                }
-                
-                // Add female voice
-                (femaleVoices.firstOrNull() ?: neutralVoices.getOrNull(1))?.let { voice ->
-                    voiceCharacters.add(VoiceCharacter(
-                        "$country $localeName - Female",
-                        1.0f, 1.1f,
-                        "Female voice with $localeName accent",
-                        voice
-                    ))
+
+                android.util.Log.d("SettingsFragment", "📢 Locale $locale has ${voices.size} voices")
+
+                // Better gender detection from voice name
+                // Google TTS names often have hints: 'f' for female, 'm' for male
+                // Examples: en-us-x-sfg-local (f=female), en-gb-x-gbm-local (m=male)
+                voices.forEachIndexed { index, voice ->
+                    val vName = voice.name.lowercase()
+
+                    // Detect gender from voice name patterns
+                    val isFemale = vName.contains("female") ||
+                            vName.contains("#female") ||
+                            vName.contains("-f-") ||
+                            vName.contains("_f_") ||
+                            vName.contains("-sf") ||  // Google pattern: sf = standard female
+                            (vName.contains("-x-") && vName.substringAfter("-x-")
+                                .startsWith("sf")) ||
+                            (vName.contains("-x-") && vName.substringAfter("-x-").take(3)
+                                .contains("f"))
+
+                    val isMale = !isFemale && (
+                            vName.contains("male") ||
+                                    vName.contains("#male") ||
+                                    vName.contains("-m-") ||
+                                    vName.contains("_m_") ||
+                                    vName.contains("-sm") ||  // Google pattern: sm = standard male
+                                    (vName.contains("-x-") && vName.substringAfter("-x-")
+                                        .startsWith("sm")) ||
+                                    (vName.contains("-x-") && vName.substringAfter("-x-").take(3)
+                                        .contains("m"))
+                            )
+
+                    val genderLabel = when {
+                        isFemale -> "Female"
+                        isMale -> "Male"
+                        else -> "Voice ${index + 1}"  // Neutral label for unknown gender
+                    }
+
+                    val displayName = "$country $localeName - $genderLabel"
+                    val pitch = if (isFemale) 1.1f else 0.9f
+
+                    android.util.Log.d(
+                        "SettingsFragment",
+                        "📢 Adding voice: $displayName -> ${voice.name}"
+                    )
+
+                    voiceCharacters.add(
+                        VoiceCharacter(
+                            displayName,
+                            1.0f,
+                            pitch,
+                            "$genderLabel voice with $localeName accent",
+                            voice  // ACTUAL voice object - important!
+                        )
+                    )
                 }
             }
-            
-            // Add preset voice styles
-            voiceCharacters.add(VoiceCharacter("🎭 Calm & Slow", 0.85f, 0.95f, "Relaxed and clear", null))
-            voiceCharacters.add(VoiceCharacter("⚡ Fast & Energetic", 1.3f, 1.15f, "Quick and lively", null))
-            voiceCharacters.add(VoiceCharacter("🎙️ Deep Voice", 0.95f, 0.7f, "Lower, deeper tone", null))
-            voiceCharacters.add(VoiceCharacter("🎵 High Pitch", 1.05f, 1.4f, "Higher, lighter tone", null))
-            voiceCharacters.add(VoiceCharacter("🎬 Narrator", 0.9f, 0.85f, "Story-telling style", null))
-            voiceCharacters.add(VoiceCharacter("⚙️ Custom", 1.0f, 1.0f, "Use sliders below", null))
-            
+
+            // Add preset voice styles (these use speed/pitch only, no specific voice)
+            voiceCharacters.add(
+                VoiceCharacter(
+                    "☁ Calm & Slow",
+                    0.85f,
+                    0.95f,
+                    "Relaxed and clear",
+                    null
+                )
+            )
+            voiceCharacters.add(
+                VoiceCharacter(
+                    "▶ Fast & Energetic",
+                    1.3f,
+                    1.15f,
+                    "Quick and lively",
+                    null
+                )
+            )
+            voiceCharacters.add(
+                VoiceCharacter(
+                    "🔉 Deep Voice",
+                    0.95f,
+                    0.7f,
+                    "Lower, deeper tone",
+                    null
+                )
+            )
+            voiceCharacters.add(
+                VoiceCharacter(
+                    "🔔 High Pitch",
+                    1.05f,
+                    1.4f,
+                    "Higher, lighter tone",
+                    null
+                )
+            )
+            voiceCharacters.add(
+                VoiceCharacter(
+                    "📖 Narrator",
+                    0.9f,
+                    0.85f,
+                    "Story-telling style",
+                    null
+                )
+            )
+            voiceCharacters.add(VoiceCharacter("⚙ Custom", 1.0f, 1.0f, "Use sliders below", null))
+
+            android.util.Log.d(
+                "SettingsFragment",
+                "📢 Total voice characters: ${voiceCharacters.size}"
+            )
+
             // Update dropdown on main thread
             activity?.runOnUiThread {
                 setupVoiceDropdown()
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            android.util.Log.e("SettingsFragment", "❌ Error loading voices: ${e.message}")
+
             // Fallback to basic presets
             voiceCharacters.clear()
             voiceCharacters.add(VoiceCharacter("🇺🇸 US English - Male", 1.0f, 0.9f, "American male", null))
@@ -165,9 +239,9 @@ class SettingsFragment : Fragment() {
             voiceCharacters.add(VoiceCharacter("🇬🇧 British - Female", 1.0f, 1.1f, "British female", null))
             voiceCharacters.add(VoiceCharacter("🇮🇳 Indian - Male", 1.0f, 0.9f, "Indian male", null))
             voiceCharacters.add(VoiceCharacter("🇮🇳 Indian - Female", 1.0f, 1.1f, "Indian female", null))
-            voiceCharacters.add(VoiceCharacter("🎭 Calm & Slow", 0.85f, 0.95f, "Relaxed", null))
-            voiceCharacters.add(VoiceCharacter("⚡ Fast & Energetic", 1.3f, 1.15f, "Quick", null))
-            voiceCharacters.add(VoiceCharacter("⚙️ Custom", 1.0f, 1.0f, "Use sliders", null))
+            voiceCharacters.add(VoiceCharacter("☁ Calm & Slow", 0.85f, 0.95f, "Relaxed", null))
+            voiceCharacters.add(VoiceCharacter("▶ Fast & Energetic", 1.3f, 1.15f, "Quick", null))
+            voiceCharacters.add(VoiceCharacter("⚙ Custom", 1.0f, 1.0f, "Use sliders", null))
             
             activity?.runOnUiThread {
                 setupVoiceDropdown()
@@ -369,7 +443,30 @@ class SettingsFragment : Fragment() {
         val voiceCharName = if (selectedVoiceIndex < voiceCharacters.size) {
             voiceCharacters[selectedVoiceIndex].name
         } else "Default"
-        
+
+        // Get the ACTUAL TTS voice name (like "en-us-x-sfg-local")
+        val actualVoiceName = if (selectedVoiceIndex < voiceCharacters.size) {
+            voiceCharacters[selectedVoiceIndex].actualVoice?.name ?: ""
+        } else ""
+
+        android.util.Log.d("SettingsFragment", "====== SAVING VOICE SETTINGS ======")
+        android.util.Log.d("SettingsFragment", "📝 selectedVoiceIndex: $selectedVoiceIndex")
+        android.util.Log.d("SettingsFragment", "📝 voiceCharName: '$voiceCharName'")
+        android.util.Log.d("SettingsFragment", "📝 actualVoiceName: '$actualVoiceName'")
+        android.util.Log.d("SettingsFragment", "📝 voiceSpeed: ${voiceSpeedSlider.value}")
+        android.util.Log.d("SettingsFragment", "📝 voicePitch: ${voicePitchSlider.value}")
+
+        if (actualVoiceName.isBlank()) {
+            android.util.Log.w("SettingsFragment", "⚠️ WARNING: actualVoiceName is EMPTY!")
+            android.util.Log.w(
+                "SettingsFragment",
+                "⚠️ This voice preset has no actual TTS voice attached"
+            )
+        } else {
+            android.util.Log.d("SettingsFragment", "✅ actualVoiceName is set correctly")
+        }
+        android.util.Log.d("SettingsFragment", "====================================")
+
         val settings = UserSettings(
             name = editName.text.toString().trim(),
             age = editAge.text.toString().toIntOrNull() ?: 0,
@@ -380,11 +477,19 @@ class SettingsFragment : Fragment() {
             ttsEnabled = switchTts.isChecked,
             voiceCharacter = voiceCharName,
             voiceSpeed = voiceSpeedSlider.value.coerceIn(0.5f, 2.0f),
-            voicePitch = voicePitchSlider.value.coerceIn(0.5f, 2.0f)
+            voicePitch = voicePitchSlider.value.coerceIn(0.5f, 2.0f),
+            actualVoiceName = actualVoiceName
         )
-        
+
         chatViewModel.saveUserSettings(settings)
-        Toast.makeText(requireContext(), "Settings saved!", Toast.LENGTH_SHORT).show()
+
+        // Show more informative toast
+        val toastMsg = if (actualVoiceName.isNotBlank()) {
+            "Settings saved! Voice: $voiceCharName"
+        } else {
+            "Settings saved! Using preset: $voiceCharName"
+        }
+        Toast.makeText(requireContext(), toastMsg, Toast.LENGTH_SHORT).show()
     }
     
     override fun onDestroy() {

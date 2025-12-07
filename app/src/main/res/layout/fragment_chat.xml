@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundColor"
+    android:background="@color/backgroundColor">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
     android:orientation="vertical">
 
     <!-- Header -->
@@ -83,10 +87,10 @@
             android:padding="0dp"
             app:backgroundTint="@color/iconBackgroundColor"
             app:cornerRadius="18dp"
-            app:icon="@drawable/model_icon"
+            app:icon="@drawable/ic_model_selector"
             app:iconGravity="textStart"
             app:iconPadding="0dp"
-            app:iconSize="18dp"
+            app:iconSize="20dp"
             app:iconTint="@color/iconColor" />
     </LinearLayout>
 
@@ -156,7 +160,72 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Input Field with Model Selector -->
+        <!-- Attachment Preview (shown when file is selected) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/attachmentPreviewCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/inputFieldBackground"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <!-- Thumbnail -->
+                <ImageView
+                    android:id="@+id/attachmentThumbnail"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_input_field" />
+
+                <!-- File Info -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/attachmentFileName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:maxLines="1"
+                        android:text="filename.jpg"
+                        android:textColor="@color/textPrimary"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/attachmentFileSize"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="124 KB"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Remove button -->
+                <ImageView
+                    android:id="@+id/btnRemoveAttachment"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Remove"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_close" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Input Field with Model Selector and Attachment -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -166,6 +235,16 @@
             android:paddingStart="4dp"
             android:paddingEnd="8dp"
             android:paddingVertical="4dp">
+
+            <!-- Attachment Button -->
+            <ImageView
+                android:id="@+id/btnAttachment"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Attach file"
+                android:padding="6dp"
+                android:src="@drawable/ic_attachment" />
 
             <!-- Current Model Icon - click to change model -->
             <ImageView
@@ -211,3 +290,5 @@
     </LinearLayout>
 
 </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

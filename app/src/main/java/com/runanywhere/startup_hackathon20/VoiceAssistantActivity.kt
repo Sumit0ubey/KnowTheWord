@@ -1,11 +1,16 @@
 package com.runanywhere.startup_hackathon20
 
 import android.Manifest
+import android.app.PictureInPictureParams
 import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.Rational
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -33,6 +38,7 @@ class VoiceAssistantActivity : AppCompatActivity() {
 
     private lateinit var voiceCircle: View
     private lateinit var pulseRing: View
+    private lateinit var glowRing: View
     private lateinit var micIcon: ImageView
     private lateinit var statusText: TextView
     private lateinit var transcribedText: TextView
@@ -42,9 +48,23 @@ class VoiceAssistantActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var progressText: TextView
     private lateinit var progressContainer: View
+    private lateinit var voiceCircleContainer: android.widget.FrameLayout
+    private lateinit var headerLayout: View
 
     private var speechService: GoogleSpeechService? = null
     private var isProcessing = false
+    private var isInPipMode = false
+
+    // PiP params for entering picture-in-picture mode
+    private val pipParams: PictureInPictureParams by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PictureInPictureParams.Builder()
+                .setAspectRatio(Rational(1, 1))  // Square aspect ratio
+                .build()
+        } else {
+            throw IllegalStateException("PiP not supported")
+        }
+    }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -68,6 +88,7 @@ class VoiceAssistantActivity : AppCompatActivity() {
     private fun initViews() {
         voiceCircle = findViewById(R.id.voiceCircle)
         pulseRing = findViewById(R.id.pulseRing)
+        glowRing = findViewById(R.id.glowRing)
         micIcon = findViewById(R.id.micIcon)
         statusText = findViewById(R.id.statusText)
         transcribedText = findViewById(R.id.transcribedText)
@@ -77,6 +98,8 @@ class VoiceAssistantActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         progressText = findViewById(R.id.progressText)
         progressContainer = findViewById(R.id.progressContainer)
+        voiceCircleContainer = findViewById(R.id.voiceCircleContainer)
+        headerLayout = findViewById(R.id.headerLayout)
     }
 
     private fun setupClickListeners() {
@@ -213,11 +236,31 @@ class VoiceAssistantActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // Classify intent
                 val classifier = MyApplication.instance.intentClassifier
-                val classification = classifier.classify(text)
 
-                Log.d(TAG, "Intent: ${classification.type}, Params: ${classification.extractedParams}")
+                // First do quick sync classification
+                val quickResult = classifier.classify(text)
+                Log.d(
+                    TAG,
+                    "Quick Intent: ${quickResult.type}, Confidence: ${quickResult.confidence}"
+                )
+
+                // Use AI classification for potential reminders (voice is common for reminders)
+                val needsAIClassification = classifier.mightBeReminder(text) &&
+                        (quickResult.type != com.runanywhere.startup_hackathon20.domain.model.IntentType.CREATE_REMINDER ||
+                                quickResult.confidence < 0.85f)
+
+                val classification = if (needsAIClassification) {
+                    Log.d(TAG, "Using AI classification for potential reminder")
+                    runOnUiThread {
+                        statusText.text = "Understanding..."
+                    }
+                    classifier.classifyWithAI(text)
+                } else {
+                    quickResult
+                }
+
+                Log.d(TAG, "Final Intent: ${classification.type}, Params: ${classification.extractedParams}")
 
                 if (classification.type.isInstantAction()) {
                     // FAST PATH: Execute instant action (commands) - no LLM needed
@@ -229,6 +272,31 @@ class VoiceAssistantActivity : AppCompatActivity() {
                         responseText.text = result.text
                         responseText.visibility = View.VISIBLE
                         speechService?.speak(result.text)
+
+                        // Enter PiP mode if action opens another app
+                        val opensOtherApp = classification.type in listOf(
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.OPEN_APP,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.PLAY_MUSIC,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.SEND_MESSAGE,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.SEND_WHATSAPP,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.CALL_CONTACT,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.SEARCH_WEB,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.SEARCH_YOUTUBE,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.SEARCH_MAPS,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.TAKE_PHOTO,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.RECORD_VIDEO,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.OPEN_GALLERY,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.OPEN_CALENDAR,
+                            com.runanywhere.startup_hackathon20.domain.model.IntentType.OPEN_CONTACTS
+                        )
+
+                        if (opensOtherApp && result.actionResult is com.runanywhere.startup_hackathon20.domain.model.ActionResult.Success) {
+                            // Wait a moment for TTS to start, then enter PiP
+                            lifecycleScope.launch {
+                                kotlinx.coroutines.delay(500)
+                                enterPipMode()
+                            }
+                        }
                     }
                 } else {
                     // PROGRESSIVE PATH: Use LLM with streaming TTS
@@ -275,10 +343,18 @@ class VoiceAssistantActivity : AppCompatActivity() {
     /**
      * Smart LLM Response for Voice
      * Adjusts tokens based on query complexity
+     * Uses PerformanceBooster for maximum speed
      */
     private suspend fun getLLMResponseWithProgressiveTTS(text: String) {
         withContext(Dispatchers.IO) {
+            // Get performance booster
+            val performanceBooster = MyApplication.instance.performanceBooster
+
             try {
+                // 🚀 START PERFORMANCE BOOST - maximize CPU priority
+                performanceBooster.startBoost()
+                Log.d(TAG, "🚀 Performance boost STARTED (voice)")
+
                 val smartTokens = getSmartVoiceTokens(text)
                 val prompt = "Answer concisely: $text"
                 
@@ -404,6 +480,10 @@ class VoiceAssistantActivity : AppCompatActivity() {
                     responseText.visibility = View.VISIBLE
                     speechService?.speak(errorMsg)
                 }
+            } finally {
+                // 🛑 STOP PERFORMANCE BOOST - release resources
+                performanceBooster.stopBoost()
+                Log.d(TAG, "🛑 Performance boost STOPPED (voice)")
             }
         }
     }
@@ -486,10 +566,190 @@ A:"""
         pulseRing.visibility = View.INVISIBLE
     }
 
+    /**
+     * Enters Picture-in-Picture mode so Nova stays visible while other apps open.
+     * Called when executing commands like "Open Instagram"
+     */
+    fun enterPipMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                enterPictureInPictureMode(pipParams)
+                Log.d(TAG, "Entered PiP mode")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to enter PiP: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Called when PiP mode changes
+     * Creates a responsive compact UI for PiP mode
+     */
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        isInPipMode = isInPictureInPictureMode
+
+        if (isInPictureInPictureMode) {
+            // PiP MODE - Compact responsive UI
+            enterPipUI()
+        } else {
+            // FULL SCREEN MODE - Restore original UI
+            exitPipUI()
+        }
+    }
+
+    /**
+     * Setup compact UI for PiP mode
+     */
+    private fun enterPipUI() {
+        Log.d(TAG, "🔄 Entering PiP UI mode")
+
+        // Hide non-essential elements
+        closeButton.visibility = View.GONE
+        hintText.visibility = View.GONE
+        progressContainer.visibility = View.GONE
+        headerLayout.visibility = View.GONE
+
+        // Compact status text
+        statusText.visibility = View.VISIBLE
+        statusText.textSize = 10f
+        statusText.setPadding(4, 2, 4, 2)
+
+        // Compact transcribed text - show what user said
+        transcribedText.visibility = View.VISIBLE
+        transcribedText.textSize = 8f
+        transcribedText.maxLines = 1
+        transcribedText.setPadding(4, 2, 4, 2)
+
+        // Compact response text - show AI response
+        responseText.visibility = View.VISIBLE
+        responseText.textSize = 9f
+        responseText.maxLines = 2
+        responseText.setPadding(4, 2, 4, 2)
+
+        // Shrink voice circle container
+        voiceCircleContainer.layoutParams = voiceCircleContainer.layoutParams.apply {
+            width = dpToPx(80)
+            height = dpToPx(80)
+        }
+
+        // Shrink voice circle
+        voiceCircle.layoutParams = voiceCircle.layoutParams.apply {
+            width = dpToPx(60)
+            height = dpToPx(60)
+        }
+
+        // Shrink mic icon
+        micIcon.layoutParams = micIcon.layoutParams.apply {
+            width = dpToPx(28)
+            height = dpToPx(28)
+        }
+
+        // Shrink glow ring
+        glowRing.layoutParams = glowRing.layoutParams.apply {
+            width = dpToPx(80)
+            height = dpToPx(80)
+        }
+
+        // Shrink pulse ring
+        pulseRing.layoutParams = pulseRing.layoutParams.apply {
+            width = dpToPx(70)
+            height = dpToPx(70)
+        }
+
+        // Request layout update
+        voiceCircleContainer.requestLayout()
+
+        // Continue listening in PiP mode
+        if (speechService?.state?.value is GoogleSpeechService.VoiceState.Idle ||
+            speechService?.state?.value is GoogleSpeechService.VoiceState.Error
+        ) {
+            speechService?.startListening()
+        }
+
+        Log.d(TAG, "✅ PiP mode ON - compact responsive UI")
+    }
+
+    /**
+     * Restore full UI when exiting PiP mode
+     */
+    private fun exitPipUI() {
+        Log.d(TAG, "🔄 Exiting PiP UI mode")
+
+        // Show all elements
+        closeButton.visibility = View.VISIBLE
+        hintText.visibility = View.VISIBLE
+        headerLayout.visibility = View.VISIBLE
+
+        // Restore text sizes
+        statusText.visibility = View.VISIBLE
+        statusText.textSize = 22f
+        statusText.setPadding(0, 0, 0, 0)
+
+        transcribedText.textSize = 16f
+        transcribedText.maxLines = 3
+        transcribedText.setPadding(0, 0, 0, 0)
+
+        responseText.textSize = 18f
+        responseText.maxLines = 5
+        responseText.setPadding(0, 0, 0, 0)
+
+        // Restore voice circle container
+        voiceCircleContainer.layoutParams = voiceCircleContainer.layoutParams.apply {
+            width = dpToPx(240)
+            height = dpToPx(240)
+        }
+
+        // Restore voice circle
+        voiceCircle.layoutParams = voiceCircle.layoutParams.apply {
+            width = dpToPx(180)
+            height = dpToPx(180)
+        }
+
+        // Restore mic icon
+        micIcon.layoutParams = micIcon.layoutParams.apply {
+            width = dpToPx(72)
+            height = dpToPx(72)
+        }
+
+        // Restore glow ring
+        glowRing.layoutParams = glowRing.layoutParams.apply {
+            width = dpToPx(240)
+            height = dpToPx(240)
+        }
+
+        // Restore pulse ring
+        pulseRing.layoutParams = pulseRing.layoutParams.apply {
+            width = dpToPx(220)
+            height = dpToPx(220)
+        }
+
+        // Request layout update
+        voiceCircleContainer.requestLayout()
+
+        Log.d(TAG, "✅ PiP mode OFF - restored full UI")
+    }
+    
+    /**
+     * Convert dp to pixels
+     */
+    private fun dpToPx(dp: Int): Int {
+        return (dp * resources.displayMetrics.density).toInt()
+    }
+
     override fun onPause() {
         super.onPause()
-        speechService?.stopListening()
-        speechService?.stopSpeaking()
+        // Don't stop listening if going to PiP mode
+        if (!isInPipMode) {
+            // Only stop if NOT in PiP
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !isInPictureInPictureMode) {
+                speechService?.stopListening()
+                speechService?.stopSpeaking()
+            }
+        }
     }
     
     override fun onDestroy() {

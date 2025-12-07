@@ -57,6 +57,7 @@ dependencies {
     // Required SDK dependencies (transitive dependencies from AARs)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")  // For ML Kit await()
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
 
@@ -93,6 +94,11 @@ dependencies {
     
     // Vosk - Offline Speech Recognition (STT)
     implementation("com.alphacephei:vosk-android:0.3.47")
+    
+    // ML Kit - Image Analysis (for actual image understanding)
+    implementation("com.google.mlkit:image-labeling:17.0.9")           // Object detection
+    implementation("com.google.mlkit:text-recognition:16.0.1")          // OCR - read text from images
+    implementation("com.google.mlkit:face-detection:16.1.7")            // Face detection
     
     // Standard app dependencies
     implementation(libs.androidx.core.ktx)

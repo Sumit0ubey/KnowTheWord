@@ -83,19 +83,105 @@ class InstantActionExecutorImpl(
             notificationManager.createNotificationChannel(channel)
         }
     }
-    
+
+    // System control executor for new commands
+    private val systemControlExecutor by lazy { SystemControlExecutor(context) }
+
     override suspend fun execute(classification: ClassificationResult): AssistantResponse {
         return try {
             when (classification.type) {
+                // Original intents
                 IntentType.OPEN_APP -> openApp(classification.extractedParams["appName"])
                 IntentType.PLAY_MUSIC -> playMusic(classification.extractedParams["query"])
                 IntentType.SET_TIMER -> setTimer(
                     classification.extractedParams["duration"],
                     classification.extractedParams["unit"]
                 )
+
                 IntentType.CREATE_REMINDER -> createReminder(classification.extractedParams)
                 IntentType.TOGGLE_FLASHLIGHT -> toggleFlashlight(classification.extractedParams["state"])
                 IntentType.TAKE_PHOTO -> takePhoto()
+
+                // ===== NEW: System Controls via SystemControlExecutor =====
+
+                // Volume controls
+                IntentType.VOLUME_UP,
+                IntentType.VOLUME_DOWN,
+                IntentType.VOLUME_MUTE,
+                IntentType.VOLUME_MAX,
+
+                    // Brightness controls
+                IntentType.BRIGHTNESS_UP,
+                IntentType.BRIGHTNESS_DOWN,
+                IntentType.BRIGHTNESS_MAX,
+                IntentType.BRIGHTNESS_AUTO,
+
+                    // System toggles
+                IntentType.TOGGLE_WIFI,
+                IntentType.TOGGLE_BLUETOOTH,
+                IntentType.TOGGLE_MOBILE_DATA,
+                IntentType.TOGGLE_AIRPLANE_MODE,
+                IntentType.TOGGLE_DND,
+                IntentType.TOGGLE_HOTSPOT,
+                IntentType.TOGGLE_LOCATION,
+                IntentType.TOGGLE_AUTO_ROTATE,
+
+                    // Settings navigation
+                IntentType.OPEN_SETTINGS,
+                IntentType.OPEN_WIFI_SETTINGS,
+                IntentType.OPEN_BLUETOOTH_SETTINGS,
+                IntentType.OPEN_DISPLAY_SETTINGS,
+                IntentType.OPEN_SOUND_SETTINGS,
+                IntentType.OPEN_BATTERY_SETTINGS,
+                IntentType.OPEN_STORAGE_SETTINGS,
+                IntentType.OPEN_APP_SETTINGS,
+                IntentType.OPEN_NOTIFICATION_SETTINGS,
+                IntentType.OPEN_QUICK_SETTINGS,
+
+                    // Gallery/Files
+                IntentType.SHOW_RECENT_PHOTOS,
+                IntentType.OPEN_GALLERY,
+                IntentType.OPEN_DOWNLOADS,
+                IntentType.OPEN_DOCUMENTS,
+                IntentType.OPEN_FILE_MANAGER,
+
+                    // Search actions
+                IntentType.SEARCH_WEB,
+                IntentType.SEARCH_YOUTUBE,
+                IntentType.SEARCH_MAPS,
+                IntentType.SEARCH_CONTACTS,
+
+                    // Device info
+                IntentType.SHOW_BATTERY_LEVEL,
+                IntentType.SHOW_STORAGE_INFO,
+                IntentType.SHOW_TIME,
+                IntentType.SHOW_DATE,
+
+                    // Screen actions
+                IntentType.TAKE_SCREENSHOT,
+                IntentType.SCREEN_RECORD,
+                IntentType.LOCK_SCREEN,
+
+                    // Quick actions
+                IntentType.OPEN_CALCULATOR,
+                IntentType.OPEN_CALENDAR,
+                IntentType.OPEN_CONTACTS,
+                IntentType.OPEN_CLOCK,
+                IntentType.OPEN_NOTES,
+                IntentType.SCAN_QR,
+
+                    // Communication
+                IntentType.CALL_CONTACT,
+                IntentType.SEND_MESSAGE,
+                IntentType.SEND_WHATSAPP,
+
+                    // Media
+                IntentType.RECORD_VIDEO
+                    -> systemControlExecutor.execute(
+                    classification.type,
+                    classification.extractedParams
+                )
+
                 else -> AssistantResponse(
                     text = "Action not supported",
                     actionResult = ActionResult.Failure("Unsupported action type: ${classification.type}"),
@@ -465,13 +551,23 @@ class InstantActionExecutorImpl(
 
     
     /**
-     * Creates a reminder from extracted parameters and schedules a local notification.
+     * Creates a reminder from extracted parameters and schedules BOTH:
+     * 1. A system alarm (visible in Clock app)
+     * 2. A local notification backup
+     * Now supports smart-parsed time from AI analysis.
      * Requirements: 4.3, 5.1
      */
     private suspend fun createReminder(params: Map<String, String>): AssistantResponse {
         val task = params["task"]
         val time = params["time"]
-        
+        val smartParsed = params["smart_parsed"] == "true"
+        val parsedTimeMs = params["parsed_time_ms"]?.toLongOrNull()
+
+        android.util.Log.d(
+            "InstantAction",
+            "Creating reminder - task: $task, time: $time, smartParsed: $smartParsed, parsedTimeMs: $parsedTimeMs"
+        )
+
         if (task.isNullOrBlank()) {
             return AssistantResponse(
                 text = "Please specify what to remind you about",
@@ -479,38 +575,146 @@ class InstantActionExecutorImpl(
                 shouldSpeak = true
             )
         }
-        
+
         return try {
-            val triggerTimeMs = parseTimeToMillis(time)
-            
+            // Use pre-parsed time if available, otherwise parse the time string
+            val triggerTimeMs = when {
+                // If SmartReminderAnalyzer already parsed the time, use it
+                parsedTimeMs != null && parsedTimeMs > System.currentTimeMillis() -> parsedTimeMs
+
+                // If time string provided, use SmartReminderAnalyzer for better parsing
+                !time.isNullOrBlank() -> {
+                    val analyzer = SmartReminderAnalyzer()
+                    analyzer.parseTimeString(time)
+                }
+
+                // Default to 1 hour from now
+                else -> System.currentTimeMillis() + (60 * 60 * 1000)
+            }
+
             val reminder = Reminder(
                 title = task,
-                description = "",
+                description = time ?: "",
                 triggerTimeMs = triggerTimeMs
             )
-            
+
             val id = reminderRepository.create(reminder)
-            
-            // Schedule local notification for the reminder
+
+            // METHOD 1: Set SYSTEM ALARM (visible in Clock app!)
+            setSystemAlarm(task, triggerTimeMs)
+
+            // METHOD 2: Also schedule local notification as backup
             scheduleReminderNotification(id, task, triggerTimeMs)
-            
-            val timeDescription = if (time.isNullOrBlank()) {
-                "in 1 hour"
-            } else {
-                time
-            }
-            
+
+            // Format time description for user
+            val timeDescription = formatReminderTime(triggerTimeMs, time)
+
+            android.util.Log.d(
+                "InstantAction",
+                "Reminder created: id=$id, triggerTime=${java.util.Date(triggerTimeMs)}"
+            )
+
             AssistantResponse(
-                text = "I'll remind you to $task $timeDescription",
+                text = "✓ Alarm set! I'll remind you: \"$task\" $timeDescription",
                 actionResult = ActionResult.Success("Reminder created", id),
                 shouldSpeak = true
             )
         } catch (e: Exception) {
+            android.util.Log.e("InstantAction", "Reminder creation failed: ${e.message}", e)
             AssistantResponse(
                 text = "Could not create reminder: ${e.message}",
                 actionResult = ActionResult.Failure(e.message ?: "Unknown error"),
                 shouldSpeak = true
             )
+        }
+    }
+
+    /**
+     * Sets a SYSTEM ALARM that shows in the Clock app.
+     * This is what users expect when they say "set an alarm".
+     */
+    private fun setSystemAlarm(message: String, triggerTimeMs: Long) {
+        try {
+            val calendar = java.util.Calendar.getInstance()
+            calendar.timeInMillis = triggerTimeMs
+
+            val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(java.util.Calendar.MINUTE)
+
+            android.util.Log.d("InstantAction", "Setting system alarm for $hour:$minute - $message")
+
+            val intent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
+                putExtra(AlarmClock.EXTRA_HOUR, hour)
+                putExtra(AlarmClock.EXTRA_MINUTES, minute)
+                putExtra(AlarmClock.EXTRA_MESSAGE, message)
+                putExtra(AlarmClock.EXTRA_SKIP_UI, true) // Don't show alarm UI
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            context.startActivity(intent)
+            android.util.Log.d("InstantAction", "System alarm set successfully")
+
+        } catch (e: Exception) {
+            android.util.Log.e("InstantAction", "Failed to set system alarm: ${e.message}")
+            // Silently fail - notification backup will still work
+        }
+    }
+
+    /**
+     * Formats the reminder time for display to the user.
+     */
+    private fun formatReminderTime(triggerTimeMs: Long, originalTimeStr: String?): String {
+        val now = System.currentTimeMillis()
+        val diffMs = triggerTimeMs - now
+        val diffMinutes = diffMs / (60 * 1000)
+        val diffHours = diffMs / (60 * 60 * 1000)
+        val diffDays = diffMs / (24 * 60 * 60 * 1000)
+
+        // Format the calendar date/time
+        val calendar = java.util.Calendar.getInstance()
+        calendar.timeInMillis = triggerTimeMs
+        val hour = calendar.get(java.util.Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(java.util.Calendar.MINUTE)
+        val amPm = if (hour < 12) "AM" else "PM"
+        val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+        val timeStr = if (minute == 0) "$displayHour $amPm" else "$displayHour:${
+            minute.toString().padStart(2, '0')
+        } $amPm"
+
+        // Determine day description
+        val todayCal = java.util.Calendar.getInstance()
+        val isToday =
+            calendar.get(java.util.Calendar.DAY_OF_YEAR) == todayCal.get(java.util.Calendar.DAY_OF_YEAR) &&
+                    calendar.get(java.util.Calendar.YEAR) == todayCal.get(java.util.Calendar.YEAR)
+
+        todayCal.add(java.util.Calendar.DAY_OF_MONTH, 1)
+        val isTomorrow =
+            calendar.get(java.util.Calendar.DAY_OF_YEAR) == todayCal.get(java.util.Calendar.DAY_OF_YEAR) &&
+                    calendar.get(java.util.Calendar.YEAR) == todayCal.get(java.util.Calendar.YEAR)
+
+        return when {
+            diffMinutes < 60 -> "in ${diffMinutes} minutes"
+            isToday -> "today at $timeStr"
+            isTomorrow -> "tomorrow at $timeStr"
+            diffDays < 7 -> {
+                val dayName = when (calendar.get(java.util.Calendar.DAY_OF_WEEK)) {
+                    java.util.Calendar.MONDAY -> "Monday"
+                    java.util.Calendar.TUESDAY -> "Tuesday"
+                    java.util.Calendar.WEDNESDAY -> "Wednesday"
+                    java.util.Calendar.THURSDAY -> "Thursday"
+                    java.util.Calendar.FRIDAY -> "Friday"
+                    java.util.Calendar.SATURDAY -> "Saturday"
+                    java.util.Calendar.SUNDAY -> "Sunday"
+                    else -> "that day"
+                }
+                "on $dayName at $timeStr"
+            }
+
+            else -> {
+                val month = calendar.get(java.util.Calendar.MONTH) + 1
+                val day = calendar.get(java.util.Calendar.DAY_OF_MONTH)
+                "on $day/$month at $timeStr"
+            }
         }
     }
     

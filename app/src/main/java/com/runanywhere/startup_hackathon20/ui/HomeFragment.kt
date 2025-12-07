@@ -204,25 +204,19 @@ class HomeFragment : Fragment() {
         val modelIcon = itemView.findViewById<ImageView>(R.id.modelIcon)
         val modelNameView = itemView.findViewById<TextView>(R.id.modelName)
         val loadingIndicator = itemView.findViewById<ProgressBar>(R.id.loadingIndicator)
-        
-        // Star views
-        val star1 = itemView.findViewById<ImageView>(R.id.star1)
-        val star2 = itemView.findViewById<ImageView>(R.id.star2)
-        val star3 = itemView.findViewById<ImageView>(R.id.star3)
-        val star4 = itemView.findViewById<ImageView>(R.id.star4)
-        val star5 = itemView.findViewById<ImageView>(R.id.star5)
+        val powerLevel = itemView.findViewById<TextView>(R.id.powerLevel)
 
         // Set model icon based on name
         val iconRes = getModelIcon(model.name, model.id)
         modelIcon.setImageResource(iconRes)
-        
+
         // Clean model name (remove emojis) and show short name
         val cleanName = getCleanModelName(model.name)
         modelNameView.text = cleanName
-        
-        // Set star rating based on model power
-        val stars = getModelStars(model.name)
-        setStarRating(stars, star1, star2, star3, star4, star5)
+
+        // Set power level text
+        val power = getModelStars(model.name)
+        powerLevel.text = "Lv.$power"
 
         // Check if this model is currently loaded
         val isLoaded = chatViewModel.currentModelId.value == model.id
@@ -318,17 +312,6 @@ class HomeFragment : Fragment() {
         }
     }
     
-    private fun setStarRating(stars: Int, s1: ImageView, s2: ImageView, s3: ImageView, s4: ImageView, s5: ImageView) {
-        val starViews = listOf(s1, s2, s3, s4, s5)
-        starViews.forEachIndexed { index, star ->
-            if (index < stars) {
-                star.setImageResource(R.drawable.ic_star_filled)
-            } else {
-                star.setImageResource(R.drawable.ic_star_empty)
-            }
-        }
-    }
-
     private fun refreshModelCircles() {
         val models = chatViewModel.availableModels.value.filter { it.isDownloaded }
         modelsContainer.removeAllViews()

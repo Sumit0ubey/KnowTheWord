@@ -14,6 +14,7 @@
 
         <!-- Header -->
         <LinearLayout
+            android:id="@+id/headerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -71,6 +72,7 @@
 
         <!-- Voice Circle -->
         <FrameLayout
+            android:id="@+id/voiceCircleContainer"
             android:layout_width="240dp"
             android:layout_height="240dp"
             android:layout_gravity="center">

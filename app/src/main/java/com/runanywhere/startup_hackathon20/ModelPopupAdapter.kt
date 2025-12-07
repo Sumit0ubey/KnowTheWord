@@ -45,22 +45,16 @@ class ModelPopupAdapter(
         private val modelIcon: ImageView = itemView.findViewById(R.id.modelIcon)
         private val modelName: TextView = itemView.findViewById(R.id.modelName)
         private val checkIcon: ImageView = itemView.findViewById(R.id.checkIcon)
-        
-        // Star views
-        private val star1: ImageView = itemView.findViewById(R.id.star1)
-        private val star2: ImageView = itemView.findViewById(R.id.star2)
-        private val star3: ImageView = itemView.findViewById(R.id.star3)
-        private val star4: ImageView = itemView.findViewById(R.id.star4)
-        private val star5: ImageView = itemView.findViewById(R.id.star5)
+        private val powerLevel: TextView = itemView.findViewById(R.id.powerLevel)
 
         fun bind(model: ModelInfo) {
             // Use model.name like HomeFragment does, with clean name extraction
             modelName.text = getCleanModelName(model.name)
             modelIcon.setImageResource(getModelIcon(model.name, model.id))
-            
-            // Set star rating based on model power
-            val stars = getModelStars(model.name)
-            setStarRating(stars)
+
+            // Set power level text
+            val power = getModelStars(model.name)
+            powerLevel.text = "Power: $power/5"
             
             // Show check for current model
             val isSelected = model.id == currentModelId
@@ -126,17 +120,6 @@ class ModelPopupAdapter(
             }
         }
         
-        private fun setStarRating(stars: Int) {
-            val starViews = listOf(star1, star2, star3, star4, star5)
-            starViews.forEachIndexed { index, star ->
-                if (index < stars) {
-                    star.setImageResource(R.drawable.ic_star_filled)
-                } else {
-                    star.setImageResource(R.drawable.ic_star_empty)
-                }
-            }
-        }
-
         private fun getModelIcon(name: String, id: String): Int {
             val lowerName = name.lowercase()
             val lowerId = id.lowercase()

@@ -30,45 +30,15 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <!-- Star Rating -->
-        <LinearLayout
-            android:id="@+id/starsContainer"
+        <!-- Power Level Text -->
+        <TextView
+            android:id="@+id/powerLevel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/star1"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:src="@drawable/ic_star_filled" />
-
-            <ImageView
-                android:id="@+id/star2"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:src="@drawable/ic_star_filled" />
-
-            <ImageView
-                android:id="@+id/star3"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:src="@drawable/ic_star_filled" />
-
-            <ImageView
-                android:id="@+id/star4"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:src="@drawable/ic_star_empty" />
-
-            <ImageView
-                android:id="@+id/star5"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:src="@drawable/ic_star_empty" />
-
-        </LinearLayout>
+            android:text="Power: 3/5"
+            android:textColor="@color/textSecondary"
+            android:textSize="11sp" />
 
     </LinearLayout>
 

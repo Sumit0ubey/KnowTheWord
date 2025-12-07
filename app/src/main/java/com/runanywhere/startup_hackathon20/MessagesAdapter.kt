@@ -12,9 +12,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.runanywhere.startup_hackathon20.domain.model.AttachmentType
 import com.runanywhere.startup_hackathon20.domain.model.ChatMessage
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -111,13 +115,70 @@ class MessagesAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val messageText: TextView = itemView.findViewById(R.id.messageText)
         private val messageTime: TextView = itemView.findViewById(R.id.messageTime)
 
+        // Attachment views
+        private val attachmentContainer: LinearLayout? =
+            itemView.findViewById(R.id.attachmentContainer)
+        private val attachmentImageCard: CardView? = itemView.findViewById(R.id.attachmentImageCard)
+        private val attachmentImage: ImageView? = itemView.findViewById(R.id.attachmentImage)
+        private val attachmentDocContainer: LinearLayout? =
+            itemView.findViewById(R.id.attachmentDocContainer)
+        private val attachmentDocIcon: ImageView? = itemView.findViewById(R.id.attachmentDocIcon)
+        private val attachmentDocName: TextView? = itemView.findViewById(R.id.attachmentDocName)
+        private val attachmentDocSize: TextView? = itemView.findViewById(R.id.attachmentDocSize)
+
         fun bind(message: ChatMessage) {
             messageText.text = message.text
             messageTime.text = formatTime(message.timestamp)
-            
+
+            // Handle attachment display
+            if (message.hasAttachment() && attachmentContainer != null) {
+                attachmentContainer.visibility = View.VISIBLE
+                val attachment = message.attachment!!
+
+                when (attachment.type) {
+                    AttachmentType.IMAGE -> {
+                        // Show image thumbnail
+                        attachmentImageCard?.visibility = View.VISIBLE
+                        attachmentDocContainer?.visibility = View.GONE
+
+                        if (attachment.thumbnail != null) {
+                            attachmentImage?.setImageBitmap(attachment.thumbnail)
+                        } else {
+                            attachmentImage?.setImageResource(R.drawable.ic_document)
+                        }
+                    }
+
+                    AttachmentType.PDF, AttachmentType.TEXT_FILE, AttachmentType.DOCUMENT -> {
+                        // Show document info
+                        attachmentImageCard?.visibility = View.GONE
+                        attachmentDocContainer?.visibility = View.VISIBLE
+
+                        attachmentDocName?.text = attachment.fileName
+                        attachmentDocSize?.text = formatFileSize(attachment.fileSizeKB)
+
+                        // Set appropriate icon
+                        val iconRes = when (attachment.type) {
+                            AttachmentType.PDF -> R.drawable.ic_document
+                            AttachmentType.TEXT_FILE -> R.drawable.ic_document
+                            else -> R.drawable.ic_document
+                        }
+                        attachmentDocIcon?.setImageResource(iconRes)
+                    }
+                }
+            } else {
+                attachmentContainer?.visibility = View.GONE
+            }
+
             itemView.setOnLongClickListener {
                 copyToClipboard(itemView.context, message.text)
                 true
+            }
+        }
+
+        private fun formatFileSize(sizeKB: Long): String {
+            return when {
+                sizeKB < 1024 -> "${sizeKB} KB"
+                else -> String.format("%.1f MB", sizeKB / 1024.0)
             }
         }
     }
