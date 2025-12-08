@@ -10,6 +10,14 @@
 [![API](https://img.shields.io/badge/API-26%2B-brightgreen.svg)](https://android-arsenal.com/api?level=26)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+### 📥 Download Now
+
+<a href="https://github.com/Sumit0ubey/Nova/releases/download/v1.0.0/Nova.apk">
+  <img src="https://img.shields.io/badge/Download-Nova%20APK-brightgreen?style=for-the-badge&logo=android" alt="Download APK" width="250">
+</a>
+
+**Latest Version:** v1.0.0 | **Size:** ~225 MB | **Android:** 8.0+
+
 [Features](#features) • [Installation](#installation) • [Usage](#usage) • [Models](#ai-models) • [Screenshots](#screenshots)
 
 </div>
